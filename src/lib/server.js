@@ -1,10 +1,74 @@
 'use strict';
 
 const net = require('net');
+const faker = require('faker');
 const logger = require('./logger');
 
 const app = net.createServer();
 let users = [];
+
+// const removeClient = (socket) => {
+//   users = users.filter(user => user !== socket);
+//   logger.log(logger.INFO, `Removing ${socket.name}`);
+// };
+
+const parseCommand = (message, socket) => {
+  if (!message.startsWith('@')) {
+    return false;
+  }
+
+  const parsedMessage = message.split(' ');
+  const command = parsedMessage[0];
+  logger.log(logger.INFO, `Parsing command: ${command}`);
+
+  switch (command) {
+    case '@list': {
+      const totalUsers = users.map(user => user.nickname);
+      const activeUsers = totalUsers.join('\n');
+      logger.log(logger.INFO, `Active Users: ${activeUsers}`);
+      socket.write(`Currently Online (${totalUsers.length}):\n${activeUsers}\n`);
+      break;
+    }
+    case '@quit': {
+      removeClient(socket);
+      break;
+    }
+    default:
+      socket.write('Invalid command');
+      break;
+  }
+  return true;
+};
+
+app.on('connection', (socket) => { 
+  logger.log(logger.INFO, 'new socket');
+  users.push(socket);
+  socket.write('Welcome to the chat.\n');
+  socket.nickname = faker.internet.userName();
+  socket.id = faker.random.number();
+  logger.log(logger.INFO, `Nickname: ${socket.nickname}, id: ${socket.id}`);
+  socket.write(`Your name is ${socket.nickname}\n`);
+
+  socket.on('data', (data) => {
+    const message = data.toString().trim();
+    logger.log(logger.INFO, `${socket.nickname} sending message: ${message}`);
+
+    if (parseCommand(message, socket)) {
+      return;
+    }
+
+    users.forEach((client) => {
+      if (client !== socket) {
+        client.write(`${socket.nickname}: ${message}\n`);
+      }
+    });
+  });
+  // socket.on('close', removeClient(socket));
+  // socket.on('error', () => {
+  //   logger.log(logger.ERROR, socket.name);
+  //   removeClient(socket)();
+  // });
+});
 
 const server = module.exports = {};
 
