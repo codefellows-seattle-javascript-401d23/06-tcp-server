@@ -3,9 +3,18 @@
 const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
+const clientC = require('./client')
 
 const app = net.createServer();
 let clients = [];
+
+//--------------------------------------------------
+// Josh- adding Client Constructor
+// class Client {
+//   constructor(nickname) {
+//     this. = null;
+//   }   modularized this to client.js
+//--------------------------------------------------
 
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
@@ -23,6 +32,9 @@ const parseCommand = (message, socket) => {
     }
     //------------------------------------------------------------
     // insert more commands here!!!
+    // @quit to disconnect
+    //  @nickname <new-name>
+    //  @dm <to-username> <message>
     //------------------------------------------------------------
     default:
       socket.write('INVALID COMMAND');
@@ -42,22 +54,31 @@ app.on('connection', (socket) => {
   socket.write('Welcome to chat!\n');
   socket.name = faker.internet.userName();
   socket.write(`Your name is ${socket.name}\n`);
+//--------------------------------------------------------------
+//Josh
+
+//--------------------------------------------------------------    
+  
   //--------------------------------------------------------------
   // SOCKET EVENTS
   //--------------------------------------------------------------
   socket.on('data', (data) => {
     const message = data.toString().trim();
-    logger.log(logger.INFO, `Processing a message: ${message}`);
+    logger.log(logger.INFO, `Processing a message from ${socket.name}: ${message}`);
     if (parseCommand(message, socket)) {
       return;
     }
+//--------------------------------------------------------------
+// Josh - above changes the messages into readable data from the binary information
+//--------------------------------------------------------------
+
     clients.forEach((client) => {
       if (client !== socket) {
         client.write(`${socket.name}: ${message}\n`);
       }
     });
   });
-  socket.on('close', removeClient(socket));
+  // socket.on('close', removeClient(socket));
   socket.on('error', () => {
     logger.log(logger.ERROR, socket.name);
     removeClient(socket)();
@@ -78,4 +99,4 @@ server.start = () => {
 server.stop = () => {
   logger.log(logger.INFO, 'Server is offline');
   return app.close(() => {});
-}:
+}
