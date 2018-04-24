@@ -23,6 +23,17 @@ const parseCommand = (message, socket) => {
       break;
     }
     // where new commands go!
+    case '@nickname': {
+      const newName = parsedMessage[1];
+      // need to update name in clients
+
+      socket.write(`Your new name is ${newName}`);
+      break;
+    }
+    case '@quit': {
+      socket.close();
+      break;
+    }
     default:
       socket.write('INVALID COMMAND');
       break;
@@ -34,7 +45,7 @@ const removeClient = socket => () => {
   clients = clients.filter(client => client !== socket);
   logger.log(logger.INFO, `Removing ${socket.name}`);
 };
-logger.log(logger.INFO, 'test');
+
 // Socket is the name we give to a specific connection
 app.on('connection', (socket) => {
   logger.log(logger.INFO, 'new socket');
@@ -70,7 +81,7 @@ server.start = () => {
     throw new Error('missing PORT');
   }
   logger.log(logger.INFO, `Server is up on PORT ${process.env.PORT}`);
-  return app.listen({ port: process.env.PORT }, {});
+  return app.listen({ port: process.env.PORT }, () => {});
 };
 
 server.stop = () => {
