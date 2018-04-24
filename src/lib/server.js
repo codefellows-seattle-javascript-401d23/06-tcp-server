@@ -3,8 +3,8 @@
 const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
-const clientC = require('./client')
-
+// const clientC = require('./client')
+// Josh - above is future Constructor for client
 const app = net.createServer();
 let clients = [];
 
@@ -36,10 +36,10 @@ const parseCommand = (message, socket) => {
     //  @nickname <new-name>
     //  @dm <to-username> <message>
     //------------------------------------------------------------
-    case '@quit:': {
-      socket.write(`Good Bye ${socket.name}`);
-      socket.on('close', removeClient(socket));
-    }
+    // case '@quit:': {
+    //   socket.write(`Good Bye ${socket.name}`);
+    //   socket.on('close', removeClient(socket));
+    // }
     default:
       socket.write('INVALID COMMAND');
       break;
@@ -47,7 +47,7 @@ const parseCommand = (message, socket) => {
   return true;
 };
 
-const removeClients = (socket) => () => {
+const removeClient = (socket) => () => {
   clients = clients.filter(client => client !== socket);
   logger.log(logger.INFO, `Removing ${socket.name}`);
 };
@@ -58,10 +58,9 @@ app.on('connection', (socket) => {
   socket.write('Welcome to chat!\n');
   socket.name = faker.internet.userName();
   socket.write(`Your name is ${socket.name}\n`);
-//--------------------------------------------------------------
-//Josh
-
-//--------------------------------------------------------------    
+  // --------------------------------------------------------------
+  // Josh
+  // --------------------------------------------------------------
   
   //--------------------------------------------------------------
   // SOCKET EVENTS
@@ -72,9 +71,9 @@ app.on('connection', (socket) => {
     if (parseCommand(message, socket)) {
       return;
     }
-//--------------------------------------------------------------
-// Josh - above changes the messages into readable data from the binary information
-//--------------------------------------------------------------
+    // --------------------------------------------------------------
+    // Josh - above changes the messages into readable data from the binary information
+    //--------------------------------------------------------------
 
     clients.forEach((client) => {
       if (client !== socket) {
@@ -82,7 +81,7 @@ app.on('connection', (socket) => {
       }
     });
   });
-  // socket.on('close', removeClient(socket));   Josh - this was closing the connection too early moved to "@quit" command
+  socket.on('close', removeClient(socket));
   socket.on('error', () => {
     logger.log(logger.ERROR, socket.name);
     removeClient(socket)();
@@ -103,4 +102,4 @@ server.start = () => {
 server.stop = () => {
   logger.log(logger.INFO, 'Server is offline');
   return app.close(() => {});
-}
+};
