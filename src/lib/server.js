@@ -23,12 +23,24 @@ const parseCommand = (message, socket) => {
       socket.write(`${clientNames}\n`);
       break;
     }
+    case '@quit': {
+      socket.write('Bye!\n');
+      socket.end();
+      break;
+    }
     default:
       socket.write('invalid command');
       break;
   }
   return true;
 };
+// class Client {
+//   constructor(id, nickname, socket) {
+//     this.id = id;
+//     this.nickname = nickname;
+//     this.socket = socket;
+//   }
+// }
 
 const removeClient = socket => () => {
   clients = clients.filter(client => client !== socket);
