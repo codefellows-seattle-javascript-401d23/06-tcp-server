@@ -7,6 +7,14 @@ const faker = require('faker');
 const app = net.createServer();
 let clients = [];
 
+//--------------------------------------------------
+// Josh- adding Client Constructor
+// class Client {
+//   constructor(nickname) {
+//     this. = null;
+//   }
+//--------------------------------------------------
+
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
     return false;
@@ -23,6 +31,9 @@ const parseCommand = (message, socket) => {
     }
     //------------------------------------------------------------
     // insert more commands here!!!
+    // @quit to disconnect
+    //  @nickname <new-name>
+    //  @dm <to-username> <message>
     //------------------------------------------------------------
     default:
       socket.write('INVALID COMMAND');
@@ -42,15 +53,27 @@ app.on('connection', (socket) => {
   socket.write('Welcome to chat!\n');
   socket.name = faker.internet.userName();
   socket.write(`Your name is ${socket.name}\n`);
+//--------------------------------------------------------------
+//Josh
+
+//--------------------------------------------------------------    
+  
   //--------------------------------------------------------------
   // SOCKET EVENTS
   //--------------------------------------------------------------
   socket.on('data', (data) => {
     const message = data.toString().trim();
     logger.log(logger.INFO, `Processing a message: ${message}`);
+//--------------------------------------------------------------
+// check for commannds
+//--------------------------------------------------------------
     if (parseCommand(message, socket)) {
       return;
     }
+//--------------------------------------------------------------
+// check for messages
+//--------------------------------------------------------------
+
     clients.forEach((client) => {
       if (client !== socket) {
         client.write(`${socket.name}: ${message}\n`);
