@@ -44,15 +44,15 @@ app.on('connection', (socket) => {
 
   socket.on('data', (data) => {
     const message = data.toString().trim();
-    // Jennifer - data checks
+    // data checks
     logger.log(logger.INFO, `Processing message: ${message}`);
 
-    // Jennifer - check for commands
+    // check for commands
     if (parseCommand(message, socket)) {
       return;
     }
 
-    // Jennifer - check for messages
+    // check for messages
     clients.forEach((client) => {
       if (client !== socket) {
         client.write(`${socket.name}: ${message}\n`);
@@ -63,7 +63,7 @@ app.on('connection', (socket) => {
   socket.on('error', () => {
     logger.log(logger.ERROR, socket.name);
     // Jennifer - Vinicio says to do this extra execution
-    // because removeClient returns a function. I don't understand it yet.
+    // because removeClient returns a function.
     removeClient(socket)();
   });
 });
@@ -78,7 +78,7 @@ server.start = () => {
   logger.log(logger.INFO, `Server is up on PORT ${process.env.PORT}`);
 
   // Jennifer - Node is expecting a port object, not just a number
-  return app.listen({ port: process.env.PORT }, () => {});
+  return app.listen({ port: 3000 }, () => {});
 };
 
 server.stop = () => {
