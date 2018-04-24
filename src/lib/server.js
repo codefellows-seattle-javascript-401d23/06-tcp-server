@@ -25,7 +25,10 @@ server.stop = () => {
 
 const removeClient = socket => () => {
   users = users.filter(user => user !== socket);
+  const activeUsers = users.map(user => user.nickname).join('\n');
+
   logger.log(logger.INFO, `Removing ${socket.nickname}`);
+  logger.log(logger.INFO, `Active Users:\n${activeUsers}\n`);
 };
 
 const parseCommand = (message, socket) => {
@@ -54,6 +57,7 @@ const parseCommand = (message, socket) => {
       const prevName = socket.nickname;
       socket.nickname = newName;
       logger.log(logger.INFO, `${prevName} has changed their name to ${newName}`);
+      socket.write(`Your new name is ${socket.nickname}\n`);
       break;
     }
     case '@dm': {
@@ -62,7 +66,7 @@ const parseCommand = (message, socket) => {
       logger.log(logger.INFO, `${socket.nickname} has sent a dm to ${receiver}: ${dm}`);
       users.forEach((user) => {
         if (user.nickname === receiver) {
-          user.write(`Direct Message from ${socket.nickname}: ${dm}\n`)
+          user.write(`Direct Message from ${socket.nickname}: ${dm}\n`);
         }
       });
       break;
@@ -91,9 +95,9 @@ app.on('connection', (socket) => {
       return;
     }
 
-    users.forEach((client) => {
-      if (client !== socket) {
-        client.write(`${socket.nickname}: ${message}\n`);
+    users.forEach((user) => {
+      if (user !== socket) {
+        user.write(`${socket.nickname}: ${message}\n`);
       }
     });
   });
