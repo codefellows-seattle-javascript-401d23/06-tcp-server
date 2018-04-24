@@ -1,5 +1,6 @@
 'use strict';
 const winston = require('winston');
+
 const logger = module.exports = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
