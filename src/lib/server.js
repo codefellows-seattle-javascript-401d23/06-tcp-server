@@ -3,6 +3,7 @@
 const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
+const clientC = require('./client')
 
 const app = net.createServer();
 let clients = [];
@@ -12,7 +13,7 @@ let clients = [];
 // class Client {
 //   constructor(nickname) {
 //     this. = null;
-//   }
+//   }   modularized this to client.js
 //--------------------------------------------------
 
 const parseCommand = (message, socket) => {
@@ -63,15 +64,12 @@ app.on('connection', (socket) => {
   //--------------------------------------------------------------
   socket.on('data', (data) => {
     const message = data.toString().trim();
-    logger.log(logger.INFO, `Processing a message: ${message}`);
-//--------------------------------------------------------------
-// check for commannds
-//--------------------------------------------------------------
+    logger.log(logger.INFO, `Processing a message from ${socket.name}: ${message}`);
     if (parseCommand(message, socket)) {
       return;
     }
 //--------------------------------------------------------------
-// check for messages
+// Josh - above changes the messages into readable data from the binary information
 //--------------------------------------------------------------
 
     clients.forEach((client) => {
@@ -80,7 +78,7 @@ app.on('connection', (socket) => {
       }
     });
   });
-  socket.on('close', removeClient(socket));
+  // socket.on('close', removeClient(socket));
   socket.on('error', () => {
     logger.log(logger.ERROR, socket.name);
     removeClient(socket)();
