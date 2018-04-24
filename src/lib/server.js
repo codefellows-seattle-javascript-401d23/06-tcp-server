@@ -34,17 +34,20 @@ const parseCommand = (message, socket) => {
       socket.write(`New Username: ${socket.name}\n`);
       break;
     }
-    // case '@dm': {
-    //   const dmName = parsedMessage[1];
-    //   let dm = parsedMessage[2];
-
-    //   clients.forEach(client) => {
-    //     if (client.name === dm) {
-    //       client.write(`${socket.name}: ${dm.trim()}\n`);
-    //     }
-    //   };
-    //   break;
-    // }
+    case '@dm': {
+      clients.forEach((client) => {
+        const msgVal = [];
+        if (client === parsedMessage[1]) {
+          parsedMessage.forEach((data) => {
+            msgVal.push(data);
+          });
+          msgVal.join(',');
+          client.write(`${socket.name}: ${message}\n`);
+        }
+        socket.write(msgVal);
+      });
+      break;
+    }
     default:
       socket.write('INVALID COMMAND');
       break;
