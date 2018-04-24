@@ -7,10 +7,26 @@ const logger = require('./logger');
 const app = net.createServer();
 let users = [];
 
-// const removeClient = (socket) => {
-//   users = users.filter(user => user !== socket);
-//   logger.log(logger.INFO, `Removing ${socket.name}`);
-// };
+const server = module.exports = {};
+
+server.start = () => {
+  if (!process.env.PORT) {
+    logger.log(logger.ERROR, 'Port undefined');
+    throw new Error('Port undefined');
+  }
+  logger.log(logger.INFO, `Server listening on port ${process.env.PORT}`);
+  return app.listen({ port: process.env.PORT }, () => {});
+};
+
+server.stop = () => {
+  logger.log(logger.INFO, 'Server is offline');
+  return app.close(() => {});
+};
+
+const removeClient = socket => () => {
+  users = users.filter(user => user !== socket);
+  logger.log(logger.INFO, `Removing ${socket.nickname}`);
+};
 
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
@@ -30,7 +46,25 @@ const parseCommand = (message, socket) => {
       break;
     }
     case '@quit': {
-      removeClient(socket);
+      removeClient(socket)();
+      break;
+    }
+    case '@nickname': {
+      const newName = parsedMessage[1];
+      const prevName = socket.nickname;
+      socket.nickname = newName;
+      logger.log(logger.INFO, `${prevName} has changed their name to ${newName}`);
+      break;
+    }
+    case '@dm': {
+      const receiver = parsedMessage[1];
+      const dm = parsedMessage.slice(2).join(' ');
+      logger.log(logger.INFO, `${socket.nickname} has sent a dm to ${receiver}: ${dm}`);
+      users.forEach((user) => {
+        if (user.nickname === receiver) {
+          user.write(`Direct Message from ${socket.nickname}: ${dm}\n`)
+        }
+      });
       break;
     }
     default:
@@ -63,25 +97,9 @@ app.on('connection', (socket) => {
       }
     });
   });
-  // socket.on('close', removeClient(socket));
-  // socket.on('error', () => {
-  //   logger.log(logger.ERROR, socket.name);
-  //   removeClient(socket)();
-  // });
+  socket.on('close', removeClient(socket));
+  socket.on('error', () => {
+    logger.log(logger.ERROR, socket.nickname);
+    removeClient(socket)();
+  });
 });
-
-const server = module.exports = {};
-
-server.start = () => {
-  if (!process.env.PORT) {
-    logger.log(logger.ERROR, 'Port undefined');
-    throw new Error('Port undefined');
-  }
-  logger.log(logger.INFO, `Server listening on port ${process.env.PORT}`);
-  return app.listen({ port: process.env.PORT }, () => {});
-};
-
-server.stop = () => {
-  logger.log(logger.INFO, 'Server is offline');
-  return app.close(() => {});
-};
