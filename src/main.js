@@ -1,1 +1,5 @@
-console.log('main.js ran.');
+'use strict';
+
+const server = require('./lib/server');
+
+server.start();
