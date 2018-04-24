@@ -8,6 +8,11 @@ const faker = require('faker');
 const app = net.createServer();
 let clientPool = [];
 
+const removeClient = socket => () => {
+  clientPool = clientPool.filter(client => client !== socket);
+  logger.log(logger.INFO, `Removing ${socket.name} from clientPool array`);
+};
+
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
     return false;
@@ -42,11 +47,11 @@ const parseCommand = (message, socket) => {
     case '@dm': {
       console.log(parsedMessage);
       clientPool.forEach((client) => {
+        const messageValue = []; 
         if (client === parsedMessage[1]) {
-          let messageValue = []; 
           parsedMessage.forEach((data) => {
             messageValue.push(data);
-          })
+          });
           messageValue.join(',');
           client.write(`${socket.name}: ${message}\n`);
         }
@@ -59,11 +64,6 @@ const parseCommand = (message, socket) => {
       break;
   }
   return true;
-};
-
-const removeClient = socket => () => {
-  clientPool = clientPool.filter(client => client != socket);
-  logger.log(logger.INFO, `Removing ${socket.name} from clientPool array`);
 };
 
 // Socket === specific connection to our server
@@ -100,12 +100,12 @@ app.on('connection', (socket) => {
 const server = module.exports = {};
 
 server.start = () => {
-  if(!process.env.PORT) {
+  if (!process.env.PORT) {
     logger.log(logger.ERROR, 'Missing PORT value');
     throw new Error('missing PORT value');
   }
   logger.log(logger.INFO, `Server is running on PORT: ${process.env.PORT}\n`);
-  return app.listen({ port: process.env.PORT }, ()=> {});
+  return app.listen({ port: process.env.PORT }, () => {});
 };
 
 server.stop = () => {
