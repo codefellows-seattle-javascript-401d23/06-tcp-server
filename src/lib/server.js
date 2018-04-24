@@ -15,7 +15,7 @@ const parseCommand = (message, socket) => {
   }
   const parsedMessage = message.split(' ');
   const command = parsedMessage[0];
-  logger.log(logger.INFO, `Parsing a command ${command}`);
+  logger.log(logger.INFO, `Parsing a command: ${command}`);
 
   switch (command) {
     case '@list': {
@@ -23,6 +23,28 @@ const parseCommand = (message, socket) => {
       socket.write(`${clientNames}\n`);
       break;
     }
+    case '@quit': {
+      socket.write('Goodbye!\n');
+      socket.end();
+      break;
+    }
+    case '@nickname': {
+      const newUserName = parsedMessage[1];
+      socket.name = newUserName;
+      socket.write(`New Username: ${socket.name}\n`);
+      break;
+    }
+    // case '@dm': {
+    //   const dmName = parsedMessage[1];
+    //   let dm = parsedMessage[2];
+
+    //   clients.forEach(client) => {
+    //     if (client.name === dm) {
+    //       client.write(`${socket.name}: ${dm.trim()}\n`);
+    //     }
+    //   };
+    //   break;
+    // }
     default:
       socket.write('INVALID COMMAND');
       break;
