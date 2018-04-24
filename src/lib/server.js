@@ -36,6 +36,10 @@ const parseCommand = (message, socket) => {
     //  @nickname <new-name>
     //  @dm <to-username> <message>
     //------------------------------------------------------------
+    case '@quit:': {
+      socket.write(`Good Bye ${socket.name}`);
+      socket.on('close', removeClient(socket));
+    }
     default:
       socket.write('INVALID COMMAND');
       break;
@@ -78,7 +82,7 @@ app.on('connection', (socket) => {
       }
     });
   });
-  // socket.on('close', removeClient(socket));
+  // socket.on('close', removeClient(socket));   Josh - this was closing the connection too early moved to "@quit" command
   socket.on('error', () => {
     logger.log(logger.ERROR, socket.name);
     removeClient(socket)();
