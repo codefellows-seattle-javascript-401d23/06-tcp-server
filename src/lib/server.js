@@ -52,7 +52,7 @@ const parseCommand = (message, client) => {
     }
     case '@nickname': {
       client.nickname = parsedMessage[1];//eslint-disable-line
-      client.write(`Your new nickname is ${client.nickname}`);
+      client.socket.write(`Your new nickname is ${client.nickname}`);
       break;
     }
     case '@dm': {
@@ -63,7 +63,7 @@ const parseCommand = (message, client) => {
       break;
     }
     default:
-      client.write('INVALID COMMAND');
+      client.socket.write('INVALID COMMAND');
       break;
   }
   return true;
@@ -88,7 +88,7 @@ app.on('connection', (socket) => {
       return;
     }
     clientPool.forEach((user) => {
-      user.write(`${client.nickname}: ${message}\n`);
+      user.socket.write(`${client.nickname}: ${message}\n`);
     });
   });
   socket.on('close', removeClient(client));
