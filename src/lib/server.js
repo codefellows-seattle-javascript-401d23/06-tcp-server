@@ -2,9 +2,24 @@
 
 const net = require('net');
 const logger = require('./logger');
-const faker = require('faker');
 
 const app = net.createServer();
+const server = module.exports = {};
+
+server.start = () => {
+  if (!process.env.PORT) {
+    logger.log(logger.ERROR, 'missing PORT');
+    throw new Error('missing PORT');
+  }
+  logger.log(logger.INFO, `Server is up on PORT ${process.env.PORT}`);
+  return app.listen({ port: process.env.PORT }, () => {});
+};
+
+server.stop = () => {
+  logger.log(logger.INFO, 'Server is offline');
+  return app.close(() => {});
+};
+
 let clientPool = [];
 
 module.exports = class Client {
@@ -81,20 +96,4 @@ app.on('connection', (socket) => {
     logger.log(logger.ERROR, socket.nickname);
     removeClient(socket)();
   });
-});
-
-const server = module.exports = {};
-
-server.start = () => {
-  if (!process.env.PORT) {
-    logger.log(logger.ERROR, 'missing PORT');
-    throw new Error('missing PORT');
-  }
-  logger.log(logger.INFO, `Server is up on PORT ${process.env.PORT}`);
-  return app.listen({ port: process.env.PORT }, () => {});
-};
-
-server.stop = () => {
-  logger.log(logger.INFO, 'Server is offline');
-  return app.close(() => {});
-};
+}); 
