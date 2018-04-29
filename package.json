@@ -30,6 +30,7 @@
   "dependencies": {
     "dotenv": "^5.0.1",
     "faker": "^4.1.0",
+    "net": "^1.0.2",
     "winston": "^3.0.0-rc5"
   }
 }
