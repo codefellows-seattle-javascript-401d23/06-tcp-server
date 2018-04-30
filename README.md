@@ -1,51 +1,26 @@
-![cf](https://i.imgur.com/7v5ASc8.png) Lab 06: TCP Chat Server
-======
+## Lab-06: TCP Chat Server
 
-## Submission Instructions
-* Work in a fork of this repository
-* Work in a branch on your fork
-* Open a pull request to this repository
-* Submit on canvas a question and observation, how long you spent, and a link to your pull request
+**Author**: Daniel Shelton
+**Version**: 1.0.2
 
-## Configuration 
-Configure the root of your repository with the following files and directories. Thoughfully name and organize any aditional configuration or module files.
-* **README.md** - contains documentation
-* **.env** - contains env variables (should be git ignored)
-* **.gitignore** - contains a [robust](http://gitignore.io) `.gitignore` file 
-* **.eslintrc.json** - contains the course linter configuratoin
-* **.eslintignore** - contains the course linter ignore configuration
-* **package.json** - contains npm package config
-  * create a `lint` script for running eslint
-  * create a `test` script for running tests
-  * create a `start` script for running your server
-* **lib/** - contains module definitions
-* **\_\_test\_\_/** - contains unit tests
+## Overview
+This application establishes a TCP chat server for users to communicate over, each new user is assigned a randomly generated "nickname" which acts as that user's display name. 
 
-## Feature Tasks  
-For this assignment you will be building a TCP chatroom. Clients should be able to connect using a telnet client nickname them selfs and talk to each other. Clients should also be able to run special commands to quit, list users, reset their nickname, and send direct messages. You may add as many featrues to the chat as you would like. Do not use any third party librarys in your chatroom modules.
+## Architecture
+The main entry point for this application is the server.js, in addition to the server file, there is also a logger.js file for logging console messages. 
 
-#### Minimum Requirements 
-* Create a TCP Server using the NodeJS `net` module
-* Create a Client constructor that models an individual connection. 
-  * Each client instance should contain at least an `id`, `nickname`, and `socket`.
-* Clients should be able to send messages to all other clients by sending it to the server
-* Clients should be able to run special commands by sending messages that start with a command name
-  * The client should send `@quit` to disconnect
-  * The client should send `@list` to list all connectued users
-  * The client should send `@nickname <new-name>` to change their nickname
-  * The client should send `@dm <to-username> <message>` to  send a message directly to another user by nickname
-* Connected clients should be maintained in an in memory collection called the `clientPool`
-  * When a socket emits the `close` event, the socket should be removed from the client pool
-  * When a socket emits the `error` event, the error should be logged on the server
-  * When a socket emits the `data` event, the data should be logged on the server and the commands below should be implemented
+## Data Structure of Server.js
+- This file requires the net and faker npm packages as well as linking to the logger.js file.
+- PORT is set to 3000.
+- Each new connection is added to the clientPool.
+- Messages are parsed and messages beginning with a "@" symbol is identified as a command, messages not indicated as commands are posted to each active user's session.
+- Command List:
+  1. '@list': Displays a list of all users in the clientPool.
+  2. '@quit': Ends the session, all other active users are notified of the disconnection.
+  3. '@nickname <name>': Reassigns nickname.
+  4. '@dm <to-user> <message>': Sends a direct message to a specified active user, if the username entered was invalid, user is notified of the invalid entry.
 
-##  Documentation  
-In your README.md describe the exported values of each module you have defined. Every function description should include it's airty (expected number of paramiters), the expected data for each paramiter (data-type and limitations), and it's behavior (for both valid and invalued use). Feel free to write any additional information in your README.md.
+## Change Log
 
-Also write documention for starting your server and connection using telnet. Write documentation for the chat room usage.
-
-## Testing  
-No testing required for this lab. Yay!
-
-## Bonus 1pt
-Use net.Socket to test your server. Your tests should include the ability to connect, send and recieve messages, and run special commands.
+04-24-2018 8:59pm - Scaffolding/setup complete.
+04-29-2018 8:24pm - All tasks complete, TCP server is fully functioning.
