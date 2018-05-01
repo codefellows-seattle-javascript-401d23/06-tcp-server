@@ -3,6 +3,7 @@
 const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
+
 // const clientC = require('./client')
 // Josh - above is future Constructor for client
 const app = net.createServer();
@@ -103,3 +104,4 @@ server.stop = () => {
   logger.log(logger.INFO, 'Server is offline');
   return app.close(() => {});
 };
+
