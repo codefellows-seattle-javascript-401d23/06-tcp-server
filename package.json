@@ -4,9 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint .",
-    "test": "jest --coverage",
-    "start": "node index.js"
+    "test": "eslint . && jest --coverage"
   },
   "keywords": [],
   "author": "",

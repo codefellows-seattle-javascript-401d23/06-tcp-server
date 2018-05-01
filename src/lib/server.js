@@ -4,18 +4,8 @@ const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
 
-// const clientC = require('./client')
-// Josh - above is future Constructor for client
 const app = net.createServer();
 let clients = [];
-
-//--------------------------------------------------
-// Josh- adding Client Constructor
-// class Client {
-//   constructor(nickname) {
-//     this. = null;
-//   }   modularized this to client.js
-//--------------------------------------------------
 
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
