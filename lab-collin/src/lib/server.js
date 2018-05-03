@@ -4,15 +4,13 @@ const net = require('net');
 const logger = require('./logger');
 const faker = require('faker');
 
-//-------------------------------------------------------------
 const app = net.createServer();
 let clients = [];
 function Client(socket, id, nickname) {
-  this.socket = socket,
-  this.id = id,
+  this.socket = socket;
+  this.id = id;
   this.nickname = nickname;
 } 
-//-------------------------------------------------------------
 
 const parseCommand = (message, socket) => {
   if (!message.startsWith('@')) {
@@ -35,8 +33,9 @@ const parseCommand = (message, socket) => {
     }
     case '@nickname': {
       clients.forEach((client) => {
-        if (client.name === parsedMessage[1]) {
-          client.nickname = parsedMessage[1];
+        if (client.socket === socket) {
+          const newName = parsedMessage[1];
+          client.nickname = newName;
         }
       });
       break;
@@ -67,7 +66,7 @@ app.on('connection', (socket) => {
   const newClient = new Client(socket, clients.length, faker.internet.userName());
   clients.push(newClient);
   socket.write('Welcome to the chat!\n');
-  socket.write(`Your name is ${newClient.name}\n`);
+  socket.write(`Your name is ${newClient.nickname}\n`);
   //------------------------------------------------------------
   // SOCKET EVENTS
   //------------------------------------------------------------
@@ -86,7 +85,7 @@ app.on('connection', (socket) => {
     //----------------------------------------------------------
     clients.forEach((client) => {
       if (client.socket !== socket) {
-        client.write(`${client.name}: ${message}\n`);
+        client.write(`${client.nickname}: ${message}\n`);
       } 
     }); 
   });
