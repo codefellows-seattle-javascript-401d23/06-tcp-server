@@ -22,13 +22,14 @@ const parseCommand = (message, socket) => {
   
   switch (command) {
     case '@list': {
-      const clientNames = clients.map(client => client.name).join('\n');
+      const clientNames = clients.map(client => client.nickname).join('\n');
       socket.write(`${clientNames}\n`);
       break;
     }
     case '@quit': {
+      const removed = clients.filter(client => client.socket === socket);
       clients = clients.filter(client => client.socket !== socket);
-      logger.log(logger.INFO, `Removing ${socket.name}`);
+      logger.log(logger.INFO, `Removing ${removed}`);
       break;
     }
     case '@nickname': {
@@ -36,13 +37,14 @@ const parseCommand = (message, socket) => {
         if (client.socket === socket) {
           const newName = parsedMessage[1];
           client.nickname = newName;
+          client.socket.write(`your new name is ${client.nickname}`);
         }
       });
       break;
     }
     case '@dm': {
       clients.forEach((client) => {
-        if (client.socket === socket) {
+        if (client.nickname === parsedMessage[1]) {
           client.socket.write(`${parsedMessage[2]}\n`);
         }
       });
@@ -85,7 +87,7 @@ app.on('connection', (socket) => {
     //----------------------------------------------------------
     clients.forEach((client) => {
       if (client.socket !== socket) {
-        client.write(`${client.nickname}: ${message}\n`);
+        client.socket.write(`${client.nickname}: ${message}\n`);
       } 
     }); 
   });
