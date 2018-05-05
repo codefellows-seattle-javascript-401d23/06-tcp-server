@@ -2,13 +2,12 @@
 
 const net = require('net');
 const logger = require('./logger');
-const faker = require('faker');
-const Client = require('./client')
-const Commands = require('./commands')
+const Client = require('./client');
+const commands = require('./commands');
 
 const server = module.exports = net.createServer();
 let clientPool = [];
-const PORT = process.env.PORT;
+const PORT = process.env.PORT; // eslint-disable-line
 
 server.on('connection', (socket) => {
   const client = new Client(socket);
@@ -18,16 +17,16 @@ server.on('connection', (socket) => {
       |_  _|   |  _|   |   |
         ||     | |_    |  _|
         ||     |   |   | | 
-       ~~~~~~~~~~~~~~~~~~~~ 
-               chat
+       ^^^^^^^^^^^^^^^^^^^^^
+               Chat
 
             Your screen name is ${client.screenName}.
-                   [ Available Commands ] \n
-
-      @quit - quits TCP Chat \n
-      @list - to show all people connected to this TCP Chat 
-      @dm <name> <message> - direct messages another user \n
-      @screenName <name> - changes your screenName \n
+      ________________________________________________________  
+     | @quit - quits TCP Chat                                 |
+     | @list - to show all people connected to this TCP Chat  |
+     | @dm <name> <message> - direct messages another user    |
+     | @screenName <name> - changes your screenName           |
+     |________________________________________________________| 
     \n\n`);
 
   clientPool.map(c => c.socket.write(`\t${client.screenName} has joined the chat.\n`));
