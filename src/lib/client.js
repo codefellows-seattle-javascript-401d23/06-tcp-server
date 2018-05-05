@@ -1,12 +1,13 @@
+
 'use strict';
 
+const uuid = require('uuid');
+const faker = require('faker');
 
-// module.exports = class ClientC {
-//   constructor(name)
-//   this.name = name;
-//   userID = `user~ID~${name}`;
-//   this.socket = null;
-// }
+function Client(socket) {
+  this.socket = socket;
+  this.id = uuid('uuid/v4');
+  this.nickname = faker.name.firstName();
+}
 
-// Josh - This constructor passes a name, create an ID of user~ID~<name> and connects a null sockect
-// until it is re-assigned
+module.exports = Client;
