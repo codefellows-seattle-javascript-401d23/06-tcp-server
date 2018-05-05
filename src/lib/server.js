@@ -2,101 +2,51 @@
 
 const net = require('net');
 const logger = require('./logger');
-const faker = require('faker');
-const clientC = require('./client')
+const Client = require('./client');
+const commands = require('./commands');
 
-const app = net.createServer();
-let clients = [];
+const server = module.exports = net.createServer();
+let clientPool = [];
+const PORT = process.env.PORT; // eslint-disable-line
 
-//--------------------------------------------------
-// Josh- adding Client Constructor
-// class Client {
-//   constructor(nickname) {
-//     this. = null;
-//   }   modularized this to client.js
-//--------------------------------------------------
+server.on('connection', (socket) => {
+  const client = new Client(socket);
+  clientPool.push(client);
+  client.socket.write(`
+       ____     ___     ___
+      |_  _|   |  _|   |   |
+        ||     | |_    |  _|
+        ||     |   |   | | 
+       ^^^^^^^^^^^^^^^^^^^^^
+               Chat
 
-const parseCommand = (message, socket) => {
-  if (!message.startsWith('@')) {
-    return false;
-  }
-  const parsedMessage = message.split(' ');
-  const command = parsedMessage[0];
-  logger.log(logger.INFO, `Parsing a command ${command}`);
+            Your screen name is ${client.screenName}.
+      ________________________________________________________  
+     | @quit - quits TCP Chat                                 |
+     | @list - to show all people connected to this TCP Chat  |
+     | @dm <name> <message> - direct messages another user    |
+     | @screenName <name> - changes your screenName           |
+     |________________________________________________________| 
+    \n\n`);
 
-  switch (command) {
-    case '@list': {
-      const clientNames = clients.map(client => client.name).join('\n');
-      socket.write(`${clientNames}\n`);
-      break;
-    }
-    //------------------------------------------------------------
-    // insert more commands here!!!
-    // @quit to disconnect
-    //  @nickname <new-name>
-    //  @dm <to-username> <message>
-    //------------------------------------------------------------
-    default:
-      socket.write('INVALID COMMAND');
-      break;
-  }
-  return true;
-};
-
-const removeClients = (socket) => () => {
-  clients = clients.filter(client => client !== socket);
-  logger.log(logger.INFO, `Removing ${socket.name}`);
-};
-
-app.on('connection', (socket) => {
-  logger.log(logger.INFO, 'new socket');
-  clients.push(socket);
-  socket.write('Welcome to chat!\n');
-  socket.name = faker.internet.userName();
-  socket.write(`Your name is ${socket.name}\n`);
-//--------------------------------------------------------------
-//Josh
-
-//--------------------------------------------------------------    
-  
-  //--------------------------------------------------------------
-  // SOCKET EVENTS
-  //--------------------------------------------------------------
+  clientPool.map(c => c.socket.write(`\t${client.screenName} has joined the chat.\n`));
   socket.on('data', (data) => {
     const message = data.toString().trim();
-    logger.log(logger.INFO, `Processing a message from ${socket.name}: ${message}`);
-    if (parseCommand(message, socket)) {
-      return;
+
+    if (message.slice(0, 1) === '@') commands.parse(message, client, clientPool);
+    else {
+      clientPool.filter(c => c.id !== client.id)
+        .map(c => c.socket.write(`${client.screenName}: ${message}\n`));
     }
-//--------------------------------------------------------------
-// Josh - above changes the messages into readable data from the binary information
-//--------------------------------------------------------------
-
-    clients.forEach((client) => {
-      if (client !== socket) {
-        client.write(`${socket.name}: ${message}\n`);
-      }
-    });
   });
-  // socket.on('close', removeClient(socket));
-  socket.on('error', () => {
-    logger.log(logger.ERROR, socket.name);
-    removeClient(socket)();
+
+  socket.on('close', () => {
+    clientPool = clientPool.filter(c => c.id !== client.id);
+    clientPool.map(c => c.socket.write(`\t${client.screenName} has left the channel.\n`));
   });
-});
 
-const server = module.exports = {};
-
-server.start = () => {
-  if (!process.env.PORT) {
-    logger.log(logger.ERROR, 'missing PORT');
-    throw new Error('Missing PORT');
-  }
-  logger.log(logger.INFO, `Server is up on PORT ${process.env.PORT}`);
-  return app.listen({ port: process.env.PORT }, () => {});
-};
-
-server.stop = () => {
-  logger.log(logger.INFO, 'Server is offline');
-  return app.close(() => {});
-}
+  socket.on('error', (err) => {
+    logger.log(logger.ERROR, err);
+  });
+})
+  .listen(PORT, () => logger.log(logger.INFO, `Listening on port ${PORT}`));

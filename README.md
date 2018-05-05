@@ -1,52 +1,45 @@
-![cf](https://i.imgur.com/7v5ASc8.png) Lab 06: TCP Chat Server
-======
+# TCPchat
+![TCPchat logo](TCPchat-logo.png)
 
-## Submission Instructions
-* Work in a fork of this repository
-* Work in a branch on your fork
-* Write all of your code in a directory named `lab-` + `<your name>` **e.g.** `lab-susan`
-* Open a pull request to this repository
-* Submit on canvas a question and observation, how long you spent, and a link to your pull request
+**Author**: Joshua Fredrickson
 
-## Configuration 
-Configure the root of your repository with the following files and directories. Thoughfully name and organize any aditional configuration or module files.
-* **README.md** - contains documentation
-* **.env** - contains env variables (should be git ignored)
-* **.gitignore** - contains a [robust](http://gitignore.io) `.gitignore` file 
-* **.eslintrc.json** - contains the course linter configuratoin
-* **.eslintignore** - contains the course linter ignore configuration
-* **package.json** - contains npm package config
-  * create a `lint` script for running eslint
-  * create a `test` script for running tests
-  * create a `start` script for running your server
-* **lib/** - contains module definitions
-* **\_\_test\_\_/** - contains unit tests
+**Version**: 1.0.0 
 
-## Feature Tasks  
-For this assignment you will be building a TCP chatroom. Clients should be able to connect using a telnet client nickname them selfs and talk to each other. Clients should also be able to run special commands to quit, list users, reset their nickname, and send direct messages. You may add as many featrues to the chat as you would like. Do not use any third party librarys in your chatroom modules.
+## Overview
+TCPchat is a TCP chatting application.
 
-#### Minimum Requirements 
-- [x] Create a TCP Server using the NodeJS `net` module
-- [ ] Create a Client constructor that models an individual connection. 
-- [ ] Each client instance should contain at least an `id`, `nickname`, and `socket`.
-- [ ] Clients should be able to send messages to all other clients by sending it to the server
-- [ ] Clients should be able to run special commands by sending messages that start with a command name
-- [ ] The client should send `@quit` to disconnect
-- [x] The client should send `@list` to list all connectued users
-- [ ] The client should send `@nickname <new-name>` to change their nickname
-- [ ] The client should send `@dm <to-username> <message>` to  send a message directly to another user by nickname
-- [ ] Connected clients should be maintained in an in memory collection called the `clientPool`
-- [ ] When a socket emits the `close` event, the socket should be removed from the client pool
-- [ ] When a socket emits the `error` event, the error should be logged on the server
-- [ ] When a socket emits the `data` event, the data should be logged on the server and the commands below should be implemented
 
-##  Documentation  
-In your README.md describe the exported values of each module you have defined. Every function description should include it's airty (expected number of paramiters), the expected data for each paramiter (data-type and limitations), and it's behavior (for both valid and invalued use). Feel free to write any additional information in your README.md.
+## Getting Started
+To use the Lab 13 application, [Node.js](https://nodejs.org/en/), [npm](https://www.npmjs.com/) 
+(Node Package manager), and for non-Mac users, [NetCat](https://www.digitalocean
+.com/community/tutorials/how-to-use-netcat-to-establish-and-test-tcp-and-udp-connections-on-a-vps)  will need
+ to be locally installed.  Once Node.js and npm have been installed, install the TCPchat files.  
+ Prior to starting the TCPchat application, from the command line while you are in the TCPchat file 
+ folder, enter the command `npm i`.  This will download all needed dependencies for the 
+ application to run.  To start your TCP Server, you will need to type `node server.js` from the 
+ TCPchat directory in your command line. 
 
-Also write documention for starting your server and connection using telnet. Write documentation for the chat room usage.
 
-## Testing  
-No testing required for this lab. Yay!
+## Architecture
+TCPchat the following modules to operate.
+ - server.js: this runs the server and operates the chatroom.
+ - client.js: this is where the users class is.
+ - command.js: this is where the command logic is stored.
+ - logger.js: this is were the logs functionality is stored.
+ - log.log:  this is were the information and error logs are stored.
+ 
+This application was deployed with the following technologies.
+Node.js, npm, body-parser, dotenv, express, faker, mongoose, winston, babel, superagent, 
+http-errors, jest, eslint, net, uuid, NetCat, and  JavaScript
+ 
 
-## Bonus 1pt
-Use net.Socket to test your server. Your tests should include the ability to connect, send and recieve messages, and run special commands.
+## Change Log 
+05-05-2018  12:11am  Refactoring project
+05-05-2018  1:06am   Chat is working with bugs
+05-05-2018  1:27am   Bugs are gone
+05-05-2018  1:30pm   Working on README
+
+## Credits and Collaborations
+Thanks to all of the Code Fellows staff and fellow 401-d23 students.
+
+#### A Very Special Thanks to Joy Hou for teaching me about TCP servers in a way that I could understand!
