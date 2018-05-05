@@ -30,8 +30,6 @@ server.on('connection', (socket) => {
     \n\n`);
 
   clientPool.map(c => c.socket.write(`\t${client.screenName} has joined the chat.\n`));
-
-  // whenever the connecting client transmits data (writes something and presses enter), handle it
   socket.on('data', (data) => {
     const message = data.toString().trim();
 
@@ -42,13 +40,11 @@ server.on('connection', (socket) => {
     }
   });
 
-  // when the user disconnects, take user's socket out of the clientPool and inform connected users
   socket.on('close', () => {
     clientPool = clientPool.filter(c => c.id !== client.id);
     clientPool.map(c => c.socket.write(`\t${client.screenName} has left the channel.\n`));
   });
 
-  // if there is an error, log the error
   socket.on('error', (err) => {
     logger.log(logger.ERROR, err);
   });
