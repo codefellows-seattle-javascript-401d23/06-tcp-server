@@ -1,7 +1,7 @@
 ## Overview
 This is a chat application that allows users to send other users messages via a TCP server with a small list of extra functionality.
 
-## Getting Started
+## Getting Started 
 
 The following npm install should occur before attempting to run this application:
 
